@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "flutter_tutorial" "\0"
+            VALUE "FileDescription", "memorime_v1" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_tutorial" "\0"
+            VALUE "InternalName", "memorime_v1" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_tutorial.exe" "\0"
-            VALUE "ProductName", "flutter_tutorial" "\0"
+            VALUE "OriginalFilename", "memorime_v1.exe" "\0"
+            VALUE "ProductName", "memorime_v1" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

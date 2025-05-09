@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "385395233213",
+    "project_id": "memorime-2f531",
+    "storage_bucket": "memorime-2f531.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385395233213:android:63eb0d0a198c964df902d4",
+        "android_client_info": {
+          "package_name": "com.example.memorime"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABOg2iQY0SXIyr6FhIBteCcrDLtpr_QQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

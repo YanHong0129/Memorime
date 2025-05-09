@@ -1,4 +1,4 @@
-package com.example.flutter_tutorial
+package com.example.memorime
 
 import io.flutter.embedding.android.FlutterActivity
 

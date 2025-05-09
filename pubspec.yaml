@@ -1,0 +1,28 @@
+name: memorime_v1
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_auth: ^5.5.3
+  firebase_core: ^3.13.0
+  firebase_ui_auth: ^1.16.1
+  firebase_ui_oauth_google: ^1.4.1
+  google_sign_in: ^6.3.0
+  firebase_database: ^11.3.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  # assets:
+  #   - assets/
+
