@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Ensure this import is present
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,9 +13,14 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  late String role;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   bool _isObscured1 = true;
-  bool _isObscured2 = true;
 
   Future<void> login() async {
     try {
@@ -26,10 +32,28 @@ class _LoginPageState extends State<LoginPage> {
       final user = userCredential.user;
 
       if (user != null && user.emailVerified) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login successful")),
-        );
-        Navigator.pushReplacementNamed(context, '/home');
+        // Check if user email is in admin list
+        final adminDoc = await FirebaseFirestore.instance
+            .collection('config')
+            .doc('admins')
+            .get();
+
+        final adminEmails = List<String>.from(adminDoc.data()?['email'] ?? []);
+        final isAdmin = adminEmails.contains(user.email);
+
+        if (isAdmin) {
+          // Navigate to admin home page
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Welcome Admin!")),
+          );
+          Navigator.pushNamed(context, '/admin_home');
+        } else {
+          // Navigate to user home page
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login successful")),
+          );
+          Navigator.pushNamed(context, '/home');
+        }
       } else {
         await FirebaseAuth.instance.signOut();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -191,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, '/register');
+                      Navigator.pushNamed(context, '/register');
                     },
                     child: Text(
                       ' Register now',
