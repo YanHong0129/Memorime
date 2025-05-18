@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth/login.dart';
 import 'auth/register.dart';
-import 'home.dart';
+import 'home/home.dart';
 import 'admin/admin_home.dart';
 
 class MyApp extends StatelessWidget {
