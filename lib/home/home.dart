@@ -308,7 +308,7 @@ class HomePage extends StatelessWidget {
         ),
         child: FloatingActionButton(
           onPressed: () {
-            // Handle + button tap
+            Navigator.pushNamed(context, '/create_capsule');
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
