@@ -1,3 +1,4 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cmake.sourceDirectory": "C:/Users/limmi/Documents/Academic Material/Y3S2/Mobile Application Programming/Project_Code/TechTribe_MobileApp_Project/linux"
 }

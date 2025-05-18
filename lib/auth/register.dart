@@ -66,57 +66,71 @@ class _RegisterPageState extends State<RegisterPage> {
   //   }
   // }
 
-Future<void> register() async {
-  if (passwordController.text.trim() != confirmPasswordController.text.trim()) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Passwords do not match")),
-    );
-    return;
-  }
-
-  try {
-    final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
-
-    final user = userCredential.user;
-    final username = usernameController.text.trim();
-
-    if (user != null) {
-      await user.updateDisplayName(username);
-      await user.sendEmailVerification();
-
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'username': username,
-        'email': user.email,
-        'user_type': 'user',
-        'profile_picture': 'default_profile_picture.jpg',
-        'gender': '',
-        'age': '',
-        'birthday': '',
-        'created_at': FieldValue.serverTimestamp(),
-      });
+  Future<void> register() async {
+    if (passwordController.text.trim() !=
+        confirmPasswordController.text.trim()) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
+      return;
     }
 
-    if (!mounted) return;
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Registration successful. Verification email sent.")),
-    );
+      final user = userCredential.user;
+      final username = usernameController.text.trim();
 
-    Navigator.pop(context);
-  } on FirebaseAuthException catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.message ?? "Registration failed")),
-    );
+      if (user != null) {
+        await user.updateDisplayName(username);
+        await user.sendEmailVerification();
+
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'username': username,
+          'email': user.email,
+          'user_type': 'user',
+          'profile_picture': 'default_profile_picture.jpg',
+          'gender': '',
+          'age': '',
+          'birthday': '',
+          'created_at': FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Registration successful. Verification email sent."),
+        ),
+      );
+
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? "Registration failed")),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -135,7 +149,10 @@ Future<void> register() async {
                     const SizedBox(height: 5),
                     const Text(
                       'Welcome 👋',
-                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const Text(
                       'Let\'s get you started!',
@@ -252,17 +269,15 @@ Future<void> register() async {
               ),
               const SizedBox(height: 24),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center, 
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Already have an account?"
-                  ),
+                  Text("Already have an account?"),
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
                     child: const Text("Sign in"),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
