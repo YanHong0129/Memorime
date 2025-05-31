@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'auth/login.dart';
-import 'auth/register.dart';
-import 'auth/forgot_password.dart';
-import 'home/home.dart';
-import 'admin/admin_home.dart';
-import 'capsule/create_time_capsule.dart';
+import 'screens/auth/login.dart';
+import 'screens/auth/register.dart';
+import 'screens/auth/forgot_password.dart';
+import 'screens/home/home.dart';
+import 'screens/admin/admin_home.dart';
+import 'screens/capsule/create_time_capsule.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
