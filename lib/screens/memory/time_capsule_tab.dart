@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorime_v1/models/time_capsule.dart';
 import 'components/capsule_list_view.dart';
 import 'components/capsule_grid_view.dart';
 
@@ -11,6 +12,7 @@ class TimeCapsuleTab extends StatefulWidget {
 
 class _TimeCapsuleTabState extends State<TimeCapsuleTab> {
   bool isListView = true; // Default to list view
+  final List<TimeCapsule> myCapsuleList = []; // Add your capsule data here
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +82,10 @@ class _TimeCapsuleTabState extends State<TimeCapsuleTab> {
           Expanded(
             child: isListView
                 ? CapsuleListView()
-                : CapsuleGridView(),
+                : CapsuleGridView(
+                  capsules: myCapsuleList,
+                  month: DateTime(2025,6),
+                ),
           ),
         ],
       ),

@@ -1,46 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../models/time_capsule.dart';
+import '../../../repository/capsule_repository.dart';
+import '../../../services/capsule_firestore_service.dart';
 
 class CapsuleListView extends StatelessWidget {
   const CapsuleListView({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final CapsuleRepository _repository = CapsuleRepository(CapsuleFirestoreService(userId));
 
-    final List<Map<String, String>> capsules = [
-      {
-        'title': 'First Dinner with Luke',
-        'unlockDate': '9 MAY 2024',
-        'daysLeft': '28',
-        'createdDate': '9 FEB 2024',
-      },
-      {
-        'title': 'Graduation Day',
-        'unlockDate': '15 JUL 2024',
-        'daysLeft': '95',
-        'createdDate': '20 FEB 2024',
-      },
-      {
-        'title': 'Trip to Japan',
-        'unlockDate': '1 SEP 2024',
-        'daysLeft': '143',
-        'createdDate': '1 MAR 2024',
-      },
-    ];
 
-    return ListView.builder(
-      itemCount: capsules.length,
-      itemBuilder: (context, index) {
-        final capsule = capsules[index];
-        return CapsuleCard(
-          title: capsule['title']!,
-          unlockDate: capsule['unlockDate']!,
-          daysLeft: capsule['daysLeft']!,
-          createdDate: capsule['createdDate']!,
+    return StreamBuilder<List<TimeCapsule>>(
+      stream: _repository.streamCapsules(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text("No capsules found."));
+        }
+
+        final capsules = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: capsules.length,
+          itemBuilder: (context, index) {
+            final capsule = capsules[index];
+
+            // Calculate days left
+            final daysLeft = capsule.unlockDate.difference(DateTime.now()).inDays;
+
+            return CapsuleCard(
+              title: capsule.title,
+              unlockDate: _formatDate(capsule.unlockDate),
+              daysLeft: daysLeft.toString(),
+              createdDate: _formatDate(capsule.createdAt),
+            );
+          },
         );
       },
     );
   }
+
+  String _formatDate(DateTime date) {
+    return "${date.day} ${_monthName(date.month)} ${date.year}";
+  }
+
+  String _monthName(int month) {
+    const months = [
+      '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+    ];
+    return months[month];
+  }
 }
+
 
 class CapsuleCard extends StatelessWidget {
   final String title;
