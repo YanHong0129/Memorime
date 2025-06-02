@@ -84,7 +84,7 @@ class _TimeCapsuleTabState extends State<TimeCapsuleTab> {
                 ? CapsuleListView()
                 : CapsuleGridView(
                   capsules: myCapsuleList,
-                  month: DateTime(2025,6),
+                  month: DateTime.now(),
                 ),
           ),
         ],

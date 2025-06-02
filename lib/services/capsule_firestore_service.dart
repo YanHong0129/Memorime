@@ -19,10 +19,17 @@ class CapsuleFirestoreService {
 
   // Get all capsules for current user ordered by createdAt
   Future<List<TimeCapsule>> getCapsules() async {
-    final userCapsulesRef = _db.collection('users').doc(_userId).collection('capsules');
-    final query = await userCapsulesRef.orderBy('createdAt', descending: true).get();
-    return query.docs.map((doc) => TimeCapsule.fromJson(doc.data(), doc.id)).toList();
-  }
+  final query = await _db
+      .collection('capsules')
+      .where('ownerId', isEqualTo: _userId)
+      .orderBy('createdAt', descending: true)
+      .get();
+
+  return query.docs
+      .map((doc) => TimeCapsule.fromJson(doc.data(), doc.id))
+      .toList();
+}
+
 
   Stream<List<TimeCapsule>> getCapsulesStream() {
   final userCapsulesRef = _db
