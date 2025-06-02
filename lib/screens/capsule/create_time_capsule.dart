@@ -430,33 +430,31 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
     if (picked != null) setState(() => _selectedDate = picked);
   }
 
-Future<String> _uploadFileToFirebase(File file, String folderName) async {
-  try {
-    // 1. Check if file exists
-    if (!file.existsSync()) {
-      debugPrint('File does not exist at path: ${file.path}');
+  Future<String> _uploadFileToFirebase(File file, String folderName) async {
+    try {
+      // 1. Check if file exists
+      if (!file.existsSync()) {
+        debugPrint('File does not exist at path: ${file.path}');
+        return '';
+      }
+
+      // 2. Create a unique file name and reference
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+      final ref = FirebaseStorage.instance.ref().child('$folderName/$fileName');
+
+      // 3. Upload the file
+      final uploadTask = await ref.putFile(file);
+
+      // 4. Wait for the upload to complete and get the download URL
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      debugPrint('Upload successful: $downloadUrl');
+      return downloadUrl;
+
+    } catch (e) {
+      debugPrint('Upload failed: $e');
       return '';
     }
-
-    // 2. Create a unique file name and reference
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
-    final ref = FirebaseStorage.instance.ref().child('$folderName/$fileName');
-
-    // 3. Upload the file
-    final uploadTask = await ref.putFile(file);
-
-    // 4. Wait for the upload to complete and get the download URL
-    final downloadUrl = await uploadTask.ref.getDownloadURL();
-    debugPrint('Upload successful: $downloadUrl');
-    return downloadUrl;
-
-  } catch (e) {
-    debugPrint('Upload failed: $e');
-    return '';
   }
-}
-
-
 
 
   Widget _buildSectionCard(String title, IconData icon, List<File> files, VoidCallback onAdd) {
