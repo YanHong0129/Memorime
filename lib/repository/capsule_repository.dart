@@ -13,6 +13,11 @@ class CapsuleRepository {
   Future<List<TimeCapsule>> fetchAllCapsules() {
     return _firestoreService.getCapsules();
   }
+
+  Stream<List<TimeCapsule>> streamCapsules() {
+  return _firestoreService.getCapsulesStream();
+}
+
 }
 
 // class CapsuleRepository {

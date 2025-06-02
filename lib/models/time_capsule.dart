@@ -26,6 +26,8 @@ class TimeCapsule {
   });
 
   factory TimeCapsule.fromJson(Map<String, dynamic> json, String docId) {
+    print("📥 Parsed unlockDate: ${json['unlockDate']} (${json['unlockDate'].runtimeType})");
+
     return TimeCapsule(
       id: docId,
       title: json['title'] ?? '',
@@ -44,7 +46,7 @@ class TimeCapsule {
     return {
       'title': title,
       'description': description,
-      'unlockDate': Timestamp.fromDate(unlockDate),
+      'unlockDate': unlockDate != null ? Timestamp.fromDate(unlockDate) : null,
       'privacy': privacy,
       'createdAt': FieldValue.serverTimestamp(),
       'photoUrls': photoUrls,

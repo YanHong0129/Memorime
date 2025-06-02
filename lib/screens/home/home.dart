@@ -236,52 +236,72 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.home, color: Colors.blue),
-                    Text(
-                      'Home',
-                      style: TextStyle(color: Colors.blue, fontSize: 14),
-                    ),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/home');
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.home, color: Colors.blue),
+                      Text(
+                        'Home',
+                        style: TextStyle(color: Colors.blue, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.people, color: Colors.blueGrey),
-                    Text(
-                      'Friends',
-                      style: TextStyle(color: Colors.blueGrey, fontSize: 14),
-                    ),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/friends');
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.people, color: Colors.blueGrey),
+                      Text(
+                        'Friends',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 56), // Space for FAB
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.photo_album, color: Colors.blueGrey),
-                    Text(
-                      'Memory',
-                      style: TextStyle(color: Colors.blueGrey, fontSize: 14),
-                    ),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/memory');
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.photo_album, color: Colors.blueGrey),
+                      Text(
+                        'Memory',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.timeline, color: Colors.blueGrey),
-                    Text(
-                      'Timeline',
-                      style: TextStyle(color: Colors.blueGrey, fontSize: 14),
-                    ),
-                  ],
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/timeline');
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.timeline, color: Colors.blueGrey),
+                      Text(
+                        'Timeline',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:memorime_v1/screens/friends/friends_main_page.dart';
+import 'package:memorime_v1/screens/memory/memory_main_page.dart';
+import 'package:memorime_v1/screens/timeline/timeline_main_page.dart';
 import 'screens/auth/login.dart';
 import 'screens/auth/register.dart';
 import 'screens/auth/forgot_password.dart';
@@ -34,7 +37,10 @@ class MyApp extends StatelessWidget {
         '/forgot_password': (context) => const ForgotPasswordPage(),
         '/home': (context) => const HomePage(),
         '/admin_home': (context) => const AdminHomePage(),
-         '/create_capsule': (context) => const CreateTimeCapsulePage(),
+        '/create_capsule': (context) => const CreateTimeCapsulePage(),
+        '/friends': (context) => const FriendsMainPage(),
+        '/timeline': (context) => const TimelineMainPage(),
+        '/memory': (context) => const MemoryMainPage(),
       },
     );
   }
