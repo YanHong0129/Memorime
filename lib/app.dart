@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
         '/friends': (context) => const FriendsMainPage(),
         '/timeline': (context) => const TimelineMainPage(),
         '/memory': (context) => const MemoryMainPage(),
+        
       },
     );
   }

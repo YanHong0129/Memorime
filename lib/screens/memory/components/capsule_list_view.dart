@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../models/time_capsule.dart';
 import '../../../repository/capsule_repository.dart';
 import '../../../services/capsule_firestore_service.dart';
+import '../capsule_detailsPage.dart.dart';
 
 class CapsuleListView extends StatelessWidget {
   const CapsuleListView({super.key});
@@ -32,15 +33,31 @@ class CapsuleListView extends StatelessWidget {
           itemCount: capsules.length,
           itemBuilder: (context, index) {
             final capsule = capsules[index];
+            final now = DateTime.now();
 
             // Calculate days left
             final daysLeft = capsule.unlockDate.difference(DateTime.now()).inDays;
+            final isUnlocked = capsule.unlockDate.isBefore(now) ||
+                                    capsule.unlockDate.year == now.year &&
+                                    capsule.unlockDate.month == now.month &&
+                                    capsule.unlockDate.day == now.day;
 
-            return CapsuleCard(
-              title: capsule.title,
-              unlockDate: _formatDate(capsule.unlockDate),
-              daysLeft: daysLeft.toString(),
-              createdDate: _formatDate(capsule.createdAt),
+            return GestureDetector(
+              onTap: isUnlocked
+                  ? (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:(_) => CapsuleDetailPage(capsule: capsule),)
+                      );
+                  }: null,
+              child: CapsuleCard(
+                title: capsule.title,
+                unlockDate: _formatDate(capsule.unlockDate),
+                daysLeft: daysLeft.toString(),
+                createdDate: _formatDate(capsule.createdAt),
+                isUnlocked: isUnlocked,
+              ),
             );
           },
         );
@@ -67,6 +84,7 @@ class CapsuleCard extends StatelessWidget {
   final String unlockDate;
   final String daysLeft;
   final String createdDate;
+  final bool isUnlocked;
 
   const CapsuleCard({
     super.key,
@@ -74,6 +92,7 @@ class CapsuleCard extends StatelessWidget {
     required this.unlockDate,
     required this.daysLeft,
     required this.createdDate,
+    required this.isUnlocked,
   });
 
   @override
@@ -97,8 +116,8 @@ class CapsuleCard extends StatelessWidget {
         children: [
           Container(
             child: Icon(
-              Icons.lock,
-              color: Colors.blueAccent,
+              isUnlocked ? Icons.lock_open: Icons.lock,
+              color: isUnlocked ? Colors.green : Colors.blueAccent,
               size: 24.0,
             ),
           ),
