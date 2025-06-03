@@ -11,13 +11,17 @@ import 'screens/capsule/create_time_capsule.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Auth',
+      navigatorKey: navigatorKey,
+      title: 'Memorime',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
 
       localizationsDelegates: const [
