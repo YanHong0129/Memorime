@@ -610,7 +610,25 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
         'createdAt': FieldValue.serverTimestamp(),
         'ownerId': FirebaseAuth.instance.currentUser!.uid, // Ensure user is signed in
       });
+      // final userId = FirebaseAuth.instance.currentUser!.uid;
 
+      // await FirebaseFirestore.instance
+      //   .collection('users')
+      //   .doc(userId)
+      //   .collection('capsules')
+      //   .doc() // or provide your own capsule ID
+      //   .set({
+      //     'title': title,
+      //     'description': description,
+      //     'unlockDate': _selectedDate,
+      //     'privacy': _privacy,
+      //     'photoUrls': photoUrls,
+      //     'videoUrls': videoUrls,
+      //     'audioUrls': audioUrls,
+      //     'fileUrls': fileUrls,
+      //     'createdAt': FieldValue.serverTimestamp(),
+      //     'ownerId': userId,
+      //   });
 
 
       debugPrint('Title: $title');
