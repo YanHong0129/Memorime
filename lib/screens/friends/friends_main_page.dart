@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import '../group/group_page.dart';
 
 class FriendsMainPage extends StatefulWidget {
   const FriendsMainPage({super.key});
@@ -336,13 +337,37 @@ class _FriendsMainPageState extends State<FriendsMainPage>
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Friends',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: () {}, // Already on Friends page
+              child: const Text(
+                'Friends',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text('|', style: TextStyle(fontSize: 20, color: Colors.grey)),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GroupMainPage()),
+                );
+              },
+              child: const Text(
+                'Groups',
+                style: TextStyle(fontSize: 20, color: Colors.grey),
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -359,8 +384,9 @@ class _FriendsMainPageState extends State<FriendsMainPage>
           ),
           const SizedBox(width: 8),
         ],
-        elevation: 0,
-        backgroundColor: Colors.grey[50],
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Column(
         children: [
