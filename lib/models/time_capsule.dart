@@ -11,6 +11,7 @@ class TimeCapsule {
   final List<String> videoUrls;
   final List<String> audioUrls;
   final List<String> fileUrls;
+  final List<String> visibleTo;
 
   TimeCapsule({
     required this.id,
@@ -23,11 +24,10 @@ class TimeCapsule {
     this.videoUrls = const [],
     this.audioUrls = const [],
     this.fileUrls = const [],
+    this.visibleTo = const [],
   });
 
   factory TimeCapsule.fromJson(Map<String, dynamic> json, String docId) {
-    print("📥 Parsed unlockDate: ${json['unlockDate']} (${json['unlockDate'].runtimeType})");
-
     return TimeCapsule(
       id: docId,
       title: json['title'] ?? '',
@@ -39,6 +39,7 @@ class TimeCapsule {
       videoUrls: List<String>.from(json['videoUrls'] ?? []),
       audioUrls: List<String>.from(json['audioUrls'] ?? []),
       fileUrls: List<String>.from(json['fileUrls'] ?? []),
+      visibleTo: List<String>.from(json['visibleTo'] ?? []),
     );
   }
 
@@ -46,13 +47,14 @@ class TimeCapsule {
     return {
       'title': title,
       'description': description,
-      'unlockDate': unlockDate != null ? Timestamp.fromDate(unlockDate) : null,
+      'unlockDate': Timestamp.fromDate(unlockDate),
       'privacy': privacy,
       'createdAt': FieldValue.serverTimestamp(),
       'photoUrls': photoUrls,
       'videoUrls': videoUrls,
       'audioUrls': audioUrls,
       'fileUrls': fileUrls,
+      'visibleTo': visibleTo,
     };
   }
 }
