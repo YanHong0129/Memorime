@@ -10,12 +10,20 @@ class CapsuleRepository {
     return _firestoreService.addCapsule(capsule);
   }
 
-  Future<void> updateCapsule(String capsuleId, {
+  Future<void> updateCapsule(
+    String capsuleId, {
     required String privacy,
     required DateTime unlockDate,
+    List<String> visibleTo = const [],
   }) {
-    return _firestoreService.updateCapsule(capsuleId, privacy: privacy, unlockDate: unlockDate);
+    return _firestoreService.updateCapsule(
+      capsuleId,
+      privacy: privacy,
+      unlockDate: unlockDate,
+      visibleTo: visibleTo,
+    );
   }
+
 
   Future<void> deleteCapsule(String capsuleId) {
     return _firestoreService.deleteCapsule(capsuleId);
@@ -28,4 +36,8 @@ class CapsuleRepository {
   Stream<List<TimeCapsule>> streamCapsules() {
     return _firestoreService.getCapsulesStream();
   }
+
+  // Future<List<String>> changePrivacy(){
+  //   return _firestoreService.handlePrivacy(privacy: privacy);
+  // }
 }

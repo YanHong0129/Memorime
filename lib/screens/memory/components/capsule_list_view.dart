@@ -6,6 +6,7 @@ import '../../../repository/capsule_repository.dart';
 import '../../../services/capsule_firestore_service.dart';
 import '../capsule_detailsPage.dart.dart';
 import '../../../app.dart';
+import '../../capsule/select_friend.dart';
 
 class CapsuleListView extends StatefulWidget {
   const CapsuleListView({super.key});
@@ -131,10 +132,47 @@ class _CapsuleListViewState extends State<CapsuleListView> {
     );
   }
 
+  Future<List<String>> computeVisibleToUids(String privacy, List<String> selectedFriendIds) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    if (privacy == 'private') return [];
+
+    if (privacy == 'public') {
+      final firestore = FirebaseFirestore.instance;
+
+      final asOwner = await firestore
+          .collection('friendList')
+          .where('ownerId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final asFriend = await firestore
+          .collection('friendList')
+          .where('friendId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final friendUids = <String>{};
+      for (var doc in asOwner.docs) {
+        friendUids.add(doc['friendId']);
+      }
+      for (var doc in asFriend.docs) {
+        friendUids.add(doc['ownerId']);
+      }
+
+      return friendUids.toList();
+    }
+
+    if (privacy == 'specific') return selectedFriendIds;
+
+    return [userId];
+  }
+
   void _showEditDialog(BuildContext context, CapsuleRepository repo, TimeCapsule capsule) {
-    final _privacyOptions = ["Private", "Public"];
-    String selectedPrivacy = capsule.privacy;
+    final privacyOptions = ["private", "public", "specific"];
+    String selectedPrivacy = capsule.privacy.toLowerCase();
     DateTime selectedDate = capsule.unlockDate;
+    List<String> selectedVisibleTo = List.from(capsule.visibleTo);
 
     showDialog(
       context: context,
@@ -143,15 +181,62 @@ class _CapsuleListViewState extends State<CapsuleListView> {
           title: const Text("Edit Capsule"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<String>(
                 value: selectedPrivacy,
-                items: _privacyOptions
-                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                    .toList(),
-                onChanged: (val) => setState(() => selectedPrivacy = val!),
+                items: privacyOptions.map((p) {
+                  return DropdownMenuItem(
+                    value: p,
+                    child: Text(p[0].toUpperCase() + p.substring(1)),
+                  );
+                }).toList(),
+                onChanged: (val) async {
+                  if (val == null) return;
+
+                  final visibleTo = await computeVisibleToUids(val, selectedVisibleTo);
+
+                  setState(() {
+                    selectedPrivacy = val;
+                    selectedVisibleTo = visibleTo;
+                  });
+                },
                 decoration: const InputDecoration(labelText: "Privacy"),
               ),
+              const SizedBox(height: 8),
+
+              // Show friend selector info + edit button
+              if (selectedPrivacy == 'specific')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Shared with ${selectedVisibleTo.length} friend(s)',
+                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      tooltip: "Edit selected friends/groups",
+                      onPressed: () async {
+                        final result = await Navigator.push<List<String>>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SelectFriendsPage(initiallySelected: selectedVisibleTo),
+                          ),
+                        );
+
+                        if (result != null) {
+                          setState(() {
+                            selectedVisibleTo = result;
+                          });
+                        }
+                      },
+                    )
+                  ],
+                ),
+
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -190,17 +275,16 @@ class _CapsuleListViewState extends State<CapsuleListView> {
                     capsule.id,
                     privacy: selectedPrivacy,
                     unlockDate: selectedDate,
+                    visibleTo: selectedVisibleTo,
                   );
 
                   if (!mounted) return;
-
                   Navigator.pop(dialogContext);
-                  showSuccessMessage( "Capsule updated successfully!");
+                  showSuccessMessage("Capsule updated successfully!");
                 } catch (e) {
                   if (!mounted) return;
-
                   Navigator.pop(dialogContext);
-                  showErrorMessage( "Failed to update capsule.");
+                  showErrorMessage("Failed to update capsule.");
                 }
               },
             ),
@@ -209,6 +293,121 @@ class _CapsuleListViewState extends State<CapsuleListView> {
       ),
     );
   }
+
+  // void _showEditDialog(BuildContext context, CapsuleRepository repo, TimeCapsule capsule) {
+  //  final privacyOptions = ["private", "public", "specific"];
+  //   String selectedPrivacy = capsule.privacy;
+  //   DateTime selectedDate = capsule.unlockDate;
+  //   List<String> selectedVisibleTo = List.from(capsule.visibleTo);
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (dialogContext) => StatefulBuilder(
+  //       builder: (context, setState) => AlertDialog(
+  //         title: const Text("Edit Capsule"),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             DropdownButtonFormField<String>(
+  //               value: selectedPrivacy,
+  //               items: privacyOptions
+  //                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+  //                   .toList(),
+  //               onChanged: (val) async {
+  //                 if (val == 'specific') {
+  //                   final result = await Navigator.push<List<String>>(
+  //                     context,
+  //                     MaterialPageRoute(
+  //                       builder: (_) => SelectFriendsPage(initiallySelected: selectedVisibleTo),
+  //                     ),
+  //                   );
+
+  //                   if (result != null && result.isNotEmpty) {
+  //                     setState(() {
+  //                       selectedPrivacy = val!;
+  //                       selectedVisibleTo = result;
+  //                     });
+  //                   } else {
+  //                     setState(() {
+  //                       selectedPrivacy = 'private';
+  //                       selectedVisibleTo = [];
+  //                     });
+  //                   }
+  //                 } else {
+  //                   setState(() {
+  //                     selectedPrivacy = val!;
+  //                     selectedVisibleTo = [];
+  //                   });
+  //                 }
+  //               },
+  //               decoration: const InputDecoration(labelText: "Privacy"),
+  //             ),
+  //             const SizedBox(height: 12),
+  //             Row(
+  //               children: [
+  //                 const Text("Unlock Date: "),
+  //                 TextButton(
+  //                   child: Text(
+  //                     "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+  //                     style: const TextStyle(color: Colors.blue),
+  //                   ),
+  //                   onPressed: () async {
+  //                     final picked = await showDatePicker(
+  //                       context: context,
+  //                       initialDate: selectedDate,
+  //                       firstDate: DateTime.now(),
+  //                       lastDate: DateTime(2100),
+  //                     );
+  //                     if (picked != null) {
+  //                       setState(() => selectedDate = picked);
+  //                     }
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //             if (selectedPrivacy == 'specific' && selectedVisibleTo.isNotEmpty)
+  //               Padding(
+  //                 padding: const EdgeInsets.only(top: 8),
+  //                 child: Text(
+  //                   'Shared with ${selectedVisibleTo.length} friend(s)',
+  //                   style: const TextStyle(fontSize: 13, color: Colors.black54),
+  //                 ),
+  //               ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             child: const Text("Cancel"),
+  //             onPressed: () => Navigator.pop(dialogContext),
+  //           ),
+  //           ElevatedButton(
+  //             child: const Text("Save"),
+  //             onPressed: () async {
+  //               try {
+  //                 await repo.updateCapsule(
+  //                   capsule.id,
+  //                   privacy: selectedPrivacy,
+  //                   unlockDate: selectedDate,
+  //                   visibleTo: selectedPrivacy == 'specific' ? selectedVisibleTo : [],
+  //                 );
+
+  //                 if (!mounted) return;
+
+  //                 Navigator.pop(dialogContext);
+  //                 showSuccessMessage("Capsule updated successfully!");
+  //               } catch (e) {
+  //                 if (!mounted) return;
+
+  //                 Navigator.pop(dialogContext);
+  //                 showErrorMessage("Failed to update capsule.");
+  //               }
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
 
   String _formatDate(DateTime date) {

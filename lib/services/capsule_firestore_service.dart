@@ -15,15 +15,19 @@ class CapsuleFirestoreService {
     });
   }
 
-  Future<void> updateCapsule(String capsuleId, {
+  Future<void> updateCapsule(
+    String capsuleId, {
     required String privacy,
     required DateTime unlockDate,
+    List<String> visibleTo = const [],
   }) async {
     await _db.collection('capsules').doc(capsuleId).update({
       'privacy': privacy,
       'unlockDate': Timestamp.fromDate(unlockDate),
+      'visibleTo': visibleTo,
     });
   }
+
 
   Future<void> deleteCapsule(String capsuleId) async {
     await _db.collection('capsules').doc(capsuleId).delete();
@@ -51,4 +55,47 @@ class CapsuleFirestoreService {
           return TimeCapsule.fromJson(doc.data(), doc.id);
         }).toList());
   }
+
+  // Future<List<String>> handlePrivacy({
+  //     required String privacy,
+  //     List<String> selectedFriendIds = const [],
+  //   }) async {
+    
+
+  //     if (privacy == 'Private') return [];
+
+  //     if (privacy == 'Public') {
+  //       final firestore = FirebaseFirestore.instance;
+
+  //       final asOwner = await firestore
+  //           .collection('friendList')
+  //           .where('ownerId', isEqualTo: _userId)
+  //           .where('status', isEqualTo: 'accepted')
+  //           .get();
+
+  //       final asFriend = await firestore
+  //           .collection('friendList')
+  //           .where('friendId', isEqualTo: _userId)
+  //           .where('status', isEqualTo: 'accepted')
+  //           .get();
+
+  //       final friendUids = <String>{};
+
+  //       for (var doc in asOwner.docs) {
+  //         friendUids.add(doc['friendId']);
+  //       }
+  //       for (var doc in asFriend.docs) {
+  //         friendUids.add(doc['ownerId']);
+  //       }
+
+  //       return friendUids.toList();
+  //     }
+
+  //     if (privacy == 'Specific') {
+  //       return selectedFriendIds;
+  //     }
+
+  //     return [_userId]; // Fallback to private
+  //   }
+
 }
