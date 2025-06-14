@@ -712,7 +712,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     if (privacy == 'Private') {
-      return [userId]; // Only owner
+      return []; 
     }
 
     if (privacy == 'Public') {

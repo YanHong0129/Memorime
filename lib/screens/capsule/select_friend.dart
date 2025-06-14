@@ -74,6 +74,7 @@ class _SelectFriendsPageState extends State<SelectFriendsPage> {
 
       // Get groups created or joined by user
       _groups = await _groupService.getMyGroups();
+
     } catch (e) {
       debugPrint('Error loading friends/groups: $e');
     }
@@ -94,14 +95,29 @@ class _SelectFriendsPageState extends State<SelectFriendsPage> {
   }
 
   void _toggleGroupSelection(List<String> memberIds, bool isSelected) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final memberIdsWithoutCurrentUser = memberIds.where((id) => id != currentUser.uid);
+
     setState(() {
       if (isSelected) {
-        _selectedIds.addAll(memberIds);
+        _selectedIds.addAll(memberIdsWithoutCurrentUser);
       } else {
-        _selectedIds.removeAll(memberIds);
+        _selectedIds.removeAll(memberIdsWithoutCurrentUser);
       }
     });
   }
+
+  // void _toggleGroupSelection(List<String> memberIds, bool isSelected) {
+  //   setState(() {
+  //     if (isSelected) {
+  //       _selectedIds.addAll(memberIds);
+  //     } else {
+  //       _selectedIds.removeAll(memberIds);
+  //     }
+  //   });
+  // }
 
   void _submitSelection() {
     Navigator.pop(context, _selectedIds.toList());
