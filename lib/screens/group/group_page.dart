@@ -384,10 +384,41 @@ class _GroupMainPageState extends State<GroupMainPage> {
 
           final groups = snapshot.data ?? [];
           if (groups.isEmpty) {
-            return const Center(
-              child: Text(
-                "No groups created yet",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.groups, size: 125, color: Colors.grey),
+                  // const SizedBox(height: 20),
+                  const Text(
+                    "No groups created yet",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.group_add, color: Colors.white),
+                    label: const Text("Create Group", style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CreateGroupPage(),
+                        ),
+                      );
+                      _loadGroups(); // Reload after creating group
+                    },
+                  ),
+                ],
               ),
             );
           }
