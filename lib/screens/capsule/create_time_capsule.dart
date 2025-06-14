@@ -331,7 +331,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
 
   final ImagePicker _picker = ImagePicker();
 
-  List<File> _photoFiles = [];
+  final List<File> _photoFiles = [];
   List<File> _videoFiles = [];
   List<File> _audioFiles = [];
   List<File> _otherFiles = [];
@@ -674,7 +674,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
         'description': description,
         'unlockDate': _selectedDate,
         'privacy': _privacy.toLowerCase(), // private, public, specific
-        'visibleTo': _privacy == 'Specific' ? _selectedFriendIds : [], // store UIDs of specific friends
+        'visibleTo': await _computeVisibleToUids(_privacy),
         'photoUrls': photoUrls,
         'videoUrls': videoUrls,
         'audioUrls': audioUrls,
@@ -706,6 +706,49 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
       setState(() => _isLoading = false);
     }
   }
+
+
+  Future<List<String>> _computeVisibleToUids(String privacy) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    if (privacy == 'Private') {
+      return [userId]; // Only owner
+    }
+
+    if (privacy == 'Public') {
+      final firestore = FirebaseFirestore.instance;
+
+      final asOwner = await firestore
+          .collection('friendList')
+          .where('ownerId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final asFriend = await firestore
+          .collection('friendList')
+          .where('friendId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final friendUids = <String>{};
+
+      for (var doc in asOwner.docs) {
+        friendUids.add(doc['friendId']);
+      }
+      for (var doc in asFriend.docs) {
+        friendUids.add(doc['ownerId']);
+      }
+
+      return friendUids.toList();
+    }
+
+    if (privacy == 'Specific') {
+      return _selectedFriendIds;
+    }
+
+    return [userId]; // Fallback to private
+  }
+
 
   @override
   void dispose() {
