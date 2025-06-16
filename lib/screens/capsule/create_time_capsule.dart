@@ -309,6 +309,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'testing_widget.dart';
+import '../capsule/select_friend.dart';
 
 
 class CreateTimeCapsulePage extends StatefulWidget {
@@ -330,7 +331,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
 
   final ImagePicker _picker = ImagePicker();
 
-  List<File> _photoFiles = [];
+  final List<File> _photoFiles = [];
   List<File> _videoFiles = [];
   List<File> _audioFiles = [];
   List<File> _otherFiles = [];
@@ -549,6 +550,76 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
     );
   }
 
+  List<String> _privacyOptions = ['Private', 'Public', 'Specific'];
+  List<String> _selectedFriendIds = [];
+
+  Widget _buildPrivacyToggle() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Privacy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const SizedBox(height: 6),
+        ToggleButtons(
+          isSelected: _privacyOptions.map((e) => e == _privacy).toList(),
+          onPressed: (index) async {
+            final selected = _privacyOptions[index];
+            if (selected == 'Specific') {
+              // Navigate to friend selection page
+              final List<String>? result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SelectFriendsPage()),
+              );
+              if (result != null && result.isNotEmpty) {
+                setState(() {
+                  _privacy = selected;
+                  _selectedFriendIds = result;
+                });
+              } else {
+                // User backed out or selected none, fallback to Private
+                setState(() {
+                  _privacy = 'Private';
+                  _selectedFriendIds = [];
+                });
+              }
+            } else {
+              setState(() {
+                _privacy = selected;
+                _selectedFriendIds = [];
+              });
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          selectedColor: Colors.white,
+          fillColor: Colors.blue.shade700,
+          renderBorder: false,
+          constraints: const BoxConstraints(minHeight: 40, minWidth: 90),
+          children: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text('Private'),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text('Public'),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text('Specific'),
+            ),
+          ],
+        ),
+        if (_privacy == 'Specific' && _selectedFriendIds.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'Shared with ${_selectedFriendIds.length} friend(s)',
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+          ),
+      ],
+    );
+  }
+
   void _handleFormSubmission() async {
     final String title = _titleController.text.trim();
     final String description = _quillController.document.toPlainText().trim();
@@ -602,7 +673,8 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
         'title': title,
         'description': description,
         'unlockDate': _selectedDate,
-        'privacy': _privacy,
+        'privacy': _privacy.toLowerCase(), // private, public, specific
+        'visibleTo': await _computeVisibleToUids(_privacy),
         'photoUrls': photoUrls,
         'videoUrls': videoUrls,
         'audioUrls': audioUrls,
@@ -610,8 +682,6 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
         'createdAt': FieldValue.serverTimestamp(),
         'ownerId': FirebaseAuth.instance.currentUser!.uid, // Ensure user is signed in
       });
-
-
 
       debugPrint('Title: $title');
       debugPrint('Description: $description');
@@ -636,6 +706,49 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
       setState(() => _isLoading = false);
     }
   }
+
+
+  Future<List<String>> _computeVisibleToUids(String privacy) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    if (privacy == 'Private') {
+      return []; 
+    }
+
+    if (privacy == 'Public') {
+      final firestore = FirebaseFirestore.instance;
+
+      final asOwner = await firestore
+          .collection('friendList')
+          .where('ownerId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final asFriend = await firestore
+          .collection('friendList')
+          .where('friendId', isEqualTo: userId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final friendUids = <String>{};
+
+      for (var doc in asOwner.docs) {
+        friendUids.add(doc['friendId']);
+      }
+      for (var doc in asFriend.docs) {
+        friendUids.add(doc['ownerId']);
+      }
+
+      return friendUids.toList();
+    }
+
+    if (privacy == 'Specific') {
+      return _selectedFriendIds;
+    }
+
+    return [userId]; // Fallback to private
+  }
+
 
   @override
   void dispose() {
@@ -805,37 +918,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Privacy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 6),
-                      ToggleButtons(
-                        isSelected: ['Private', 'Public', 'Specific'].map((e) => e == _privacy).toList(),
-                        onPressed: (index) => setState(() => _privacy = ['Private', 'Public', 'Specific'][index]),
-                        borderRadius: BorderRadius.circular(8),
-                        selectedColor: Colors.white,
-                        fillColor: Colors.blue.shade700,
-                        renderBorder: false, 
-                        constraints: const BoxConstraints(minHeight: 40, minWidth: 90),
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Private'),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Public'),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Specific'),
-                          ),
-                        ],
-                      ),
-
-                  ],
-                ),
+                child: _buildPrivacyToggle(),
               ),
             ),
 

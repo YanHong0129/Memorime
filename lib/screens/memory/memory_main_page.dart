@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:memorime_v1/screens/memory/sharedWithYou_tab.dart';
+import 'package:memorime_v1/screens/memory/shared_memory.dart';
 import 'package:memorime_v1/screens/memory/memories_tab.dart';
 import 'package:memorime_v1/screens/memory/time_capsule_tab.dart';
 import '../user/profile.dart';
