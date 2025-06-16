@@ -228,6 +228,17 @@ Future<void> _convertToMemory(BuildContext context, QueryDocumentSnapshot capsul
 
 }
 
+Future<void> addStatusToAllCapsules() async {
+  final snapshot = await FirebaseFirestore.instance.collection('capsules').get();
+
+  for (var doc in snapshot.docs) {
+    if (!doc.data().containsKey('status')) {
+      await doc.reference.update({'status': 'locked'});
+    }
+  }
+}
+
+
 
 class CapsuleVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -274,10 +285,10 @@ class _CapsuleVideoPlayerState extends State<CapsuleVideoPlayer> {
 Widget build(BuildContext context) {
   return Column(
     children: [
-      // ElevatedButton(
-      //   onPressed: addLikesFieldToMemories,
-      //   child: const Text('Add Likes Field to Memories'),
-      // ),
+      ElevatedButton(
+        onPressed: addStatusToAllCapsules,
+        child: const Text('Add Statud'),
+      ),
       _controller.value.isInitialized
           ? AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
