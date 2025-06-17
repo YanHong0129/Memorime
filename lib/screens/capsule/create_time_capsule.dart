@@ -680,6 +680,7 @@ class _CreateTimeCapsulePageState extends State<CreateTimeCapsulePage> {
         'audioUrls': audioUrls,
         'fileUrls': fileUrls,
         'createdAt': FieldValue.serverTimestamp(),
+        'status': 'locked',
         'ownerId': FirebaseAuth.instance.currentUser!.uid, // Ensure user is signed in
       });
 
